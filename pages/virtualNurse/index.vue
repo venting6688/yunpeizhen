@@ -26,7 +26,7 @@
 							<view class="triangle"></view>
 							<view class="center">
 								<view v-if="x.msgLoad" class="cuIcon-loading turn-load" style="font-size: 50rpx;color: #60B6FE;"></view>
-								<text v-else class="msg">{{x.msg}}</text>
+								<view v-else class="msg" v-html="markdown(x.msg)"></view>
 								<!-- 消息模板 -->
 								<view class="top1" v-if="x.type==1">
 									<view @click="answer(item)" v-for="(item,index) in x.questionList" :key="index">
@@ -165,12 +165,14 @@
 	import login from '@/utils/login.js'
 	import { parse } from 'best-effort-json-parser'
 	import {mapActions} from 'vuex'
+	import MarkdownIt from 'markdown-it';
 	export default {
 	components:{
 		foot,
 	},
 		data() {
 			return {
+				md:new MarkdownIt(),
 				pattern:2,
 				patternList:[
 					'app-EONXg7ao70KnPGUvvpq4ffVE',
@@ -270,6 +272,9 @@
 			} 
 		},
 		methods: {
+			markdown(item){
+				return this.md.render(item)
+			},
 			footBarBtn(item){
 				// 切换模式
 				if(item.name==='智能导诊'){
@@ -500,7 +505,7 @@
 						}
 					    i = JSON.parse(data[j])
 						this.conversation_id = i.conversation_id
-						i.answer = i.answer&&i.answer.replace(/[ \r\n\u21B5]/g,'')
+						// i.answer = i.answer&&i.answer.replace(/[ \r\n\u21B5]/g,'')
 						if(i.answer){
 							this.test1 += i.answer
 							if(this.pattern===1){
