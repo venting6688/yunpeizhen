@@ -6,12 +6,8 @@
 			<view class="scroll" >
 			 <view class="middle">
 				<view class="li" v-for="(item,index) in personageObj.list" :key="index" @click="updateDefaultArchives(item)" :class="{blue:personageObj.sole.patientName==item.patientName}">
-					
 					<view class="name">
 						<text>{{item.patientName}}</text>
-					</view>
-					<view class="price">
-						状态:<text>{{item.state}}</text>
 					</view>
 					<view class="img" >
 						<image v-if="personageObj.sole.patientName==item.patientName" src="@/static/image/right.png" mode="widthFix"></image>
@@ -20,7 +16,7 @@
 			</view>
 			</view>
 			<view class="btn">
-				<button class="cu-btn" @click="recharge(1)">门诊充值</button>
+				<!-- <button class="cu-btn" @click="recharge(1)">门诊充值</button> -->
 				<button class="cu-btn" @click="recharge(2)">添加家庭成员</button>
 			</view>
 	</view>
@@ -112,6 +108,7 @@
 <style lang="less" scoped>
 	.blue {
 		color: #0386FF !important;
+		background: #f4faff !important;
 	}
 	.center {
 		width: 750rpx;
@@ -137,12 +134,14 @@
 						display: flex;
 						justify-content: space-between;
 						align-items: center;
-						margin-left: 2%;
-						color: #000000;
-						border-bottom: 2rpx solid #f1f1f1;
+						margin: 20rpx 5rpx;
+						color: #92a1bb;
+						padding:0 20rpx 0 40rpx;
+						background: #f9fbfe;
+						border-radius: 20rpx;
 						
-						&:last-child{
-							border: 0;
+						&:first-child{
+							margin-top: 10rpx;
 						}
 						.name {
 							width: 20%;
@@ -192,7 +191,7 @@
 				font-size: 38rpx;
 				width: 300rpx;
 				height: 80rpx;
-				background: linear-gradient(351deg,#479cff 0%, rgba(71,216,251,0.80) 100%);
+				background: #4286ff;
 				border-radius: 70rpx;
 				color: #ffffff;
 			}
