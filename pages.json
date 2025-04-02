@@ -304,7 +304,6 @@
 	]
   }],
   "tabBar": {
-  		
   		"color": "#7A7E83",
   		"selectedColor": "#086d5b",
   		"backgroundColor": "#ffffff",
@@ -326,21 +325,21 @@
     "navigationBarTitleText": "uni-app",
     "navigationBarBackgroundColor": "#ffffff",
     "backgroundColor": "#F8F8F8",
-	"usingComponents": {
-	    "van-tree-select": "/wxcomponents/vant/tree-select/index",
-		"van-search": "/wxcomponents/vant/search/index",
-		"van-notice-bar": "/wxcomponents/vant/notice-bar/index",
-		"van-switch": "/wxcomponents/vant/switch/index",
-		"van-grid": "/wxcomponents/vant/grid/index",
-		"van-grid-item": "/wxcomponents/vant/grid-item/index",
-		"van-toast": "/wxcomponents/vant/toast/index",
-		"van-rate": "/wxcomponents/vant/rate/index",
-		"van-loading": "/wxcomponents/vant/loading/index",
-		"van-progress": "/wxcomponents/vant/progress/index",
-		"van-radio": "/wxcomponents/vant/radio/index",
-		"van-radio-group": "/wxcomponents/vant/radio-group/index"
-	},
-	"permission":{
+		"usingComponents": {
+				"van-tree-select": "/wxcomponents/vant/tree-select/index",
+				"van-search": "/wxcomponents/vant/search/index",
+				"van-notice-bar": "/wxcomponents/vant/notice-bar/index",
+				"van-switch": "/wxcomponents/vant/switch/index",
+				"van-grid": "/wxcomponents/vant/grid/index",
+				"van-grid-item": "/wxcomponents/vant/grid-item/index",
+				"van-toast": "/wxcomponents/vant/toast/index",
+				"van-rate": "/wxcomponents/vant/rate/index",
+				"van-loading": "/wxcomponents/vant/loading/index",
+				"van-progress": "/wxcomponents/vant/progress/index",
+				"van-radio": "/wxcomponents/vant/radio/index",
+				"van-radio-group": "/wxcomponents/vant/radio-group/index"
+		},
+		"permission":{
 			"scope.userLocation":{
 				"desc":"获得用户当前位置"
 			},
