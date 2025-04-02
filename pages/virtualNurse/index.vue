@@ -25,7 +25,15 @@
 						<view class="robot-box"  v-if="x.type!==2">
 							<view class="triangle"></view>
 							<view class="center">
-								<view v-if="x.msgLoad" class="cuIcon-loading turn-load" style="font-size: 50rpx;color: #60B6FE;"></view>
+								<view class="loading" v-if="x.msgLoad">
+									<text>思考中</text>
+									<view class="dot">
+										<view class="stage">
+											<view  class="dot-typing"></view>
+										</view>
+									</view>
+								</view>
+								<!-- <view v-if="x.msgLoad" class="cuIcon-loading turn-load" style="font-size: 50rpx;color: #60B6FE;"></view> -->
 								<view v-else class="msg" v-html="markdown(x.msg)"></view>
 								<!-- 消息模板 -->
 								<view class="top1" v-if="x.type==1">
@@ -33,13 +41,14 @@
 										<text>{{item}}</text>
 									</view>
 								</view>
-								
+								<view class="ai-tips" v-if="pattern!==1 && !x.msgLoad && x.type!==1">
+									此内容由AI生成，仅供参考
+								</view>
 							</view>
-							<!-- 推荐科室 -->
-							
 						</view>
+						<!-- 推荐科室 -->
 						<view class="top2" v-if="x.type==2">
-							<image src="@/static/image/department.png" mode="widthFix"></image>
+							<!-- <image src="@/static/image/department.png" mode="widthFix"></image> -->
 							<view class="top2-content">
 								<view class="department" v-for="(clinic,u) in x.department" :key="u">
 									<view class="title">
@@ -54,6 +63,17 @@
 											<view class="text" >挂号</view>
 										</view>
 									</view>
+								</view>
+								
+								<view class="more">
+									<text @click="more">更多</text>
+									<image @click="tipsBtn(i)" src="../../static/image/question.png" mode="widthFix"></image>
+								</view>
+								<view class="dept-tips" v-if="x.tipsState">
+									{{x.tips}}
+								</view>
+								<view class="ai-tips" v-if="!x.msgLoad">
+									此内容由AI生成，仅供参考
 								</view>
 							</view>
 						</view>
@@ -92,8 +112,8 @@
 					<view class="btn">
 						<button hover-class="is-hover" @touchmove="handleTouchMove" @touchstart="startMic" @touchend="stopMic">按住说话</button>
 					</view>
-					
 				</view>
+				
 				<view v-else class="foot-center">
 					<view class="image">
 					<image @click="voiceState=true" src="@/static/image/voice.png" mode=""></image>	
@@ -160,22 +180,23 @@
 	var wh
 	// 顶部空盒子的高度
 	var mgUpHeight
+	
+	import MarkdownIt from 'markdown-it';
 	import foot from '@/components/footer.vue'
 	import bus from "@/utils/bus";
 	import login from '@/utils/login.js'
 	import { parse } from 'best-effort-json-parser'
 	import {mapActions} from 'vuex'
-	import MarkdownIt from 'markdown-it';
 	export default {
 	components:{
 		foot,
 	},
 		data() {
 			return {
-				md:new MarkdownIt(),
+				md: new MarkdownIt(),
 				pattern:2,
 				patternList:[
-					'app-EONXg7ao70KnPGUvvpq4ffVE',
+					'app-3y1tj6dptbvU0KIcFJorXU4Z',
 					'app-jvcTkWue6jt4pb06TWZGAsHI',
 				],
 				showComponent: true,
@@ -238,8 +259,8 @@
 		onLoad(options) {
 			if (Object.keys(options).length > 0) {
 			    this.pattern = Number(options.pattern)
+			    let manifestation = options.manifestation
 			    if(this.pattern===1){
-					this.begin()
 					uni.showToast({
 					    title: '已为您切换到智能导诊',
 					    icon: 'none',   
@@ -254,31 +275,65 @@
 						}
 					]
 			    	
-			    }else {
-					uni.showToast({
-					    title: '已为您切换到智能问答',
-					    icon: 'none',   
-					    duration: 2000 
-					}) 
-					this.msgList = [
-						{
-						    my:false,
-							type:1,
-							msg:'您可以向我询问以下问题：',
-							questionList:['感冒吃什么药','头孢的作用是什么'],
-						}
-					]
+			    }else{
+					if(manifestation){
+						this.answer(manifestation)
+					}else{
+						uni.showToast({
+						    title: '已为您切换到智能问答',
+						    icon: 'none',   
+						    duration: 2000 
+						}) 
+						this.msgList = [
+							{
+							    my:false,
+								type:1,
+								msg:'您可以向我询问以下问题：',
+								questionList:['感冒吃什么药','头孢的作用是什么'],
+							}
+						]
+					}
+					
 			    }
 			} 
 		},
+		computed: {
+		    parsedMarkdown() {
+		    }
+		},
 		methods: {
+			tipsBtn(index){
+				// 使用 this.$set 修改数组中某一项的属性
+				this.$set(this.msgList[index], 'tipsState', !this.msgList[index].tipsState);
+			},
 			markdown(item){
-				return this.md.render(item)
+				return this.md.render(item);
+			},
+			more(){
+				uni.navigateTo({
+					url: `/sub_packages/subscribe/departments`
+				})
+				// 跳转到山一大二附院小程序挂号科室页面
+				// const appId = 'wx6334d37b051ec074';
+				// const targetUrl = `pages/outpatient-department/main?hosld=2`;
+				// wx.navigateToMiniProgram({
+				//   appId: appId,
+				//   path: targetUrl,
+				//   envVersion: 'release',
+				//   success: function(res) {
+				//   },
+				//   fail: function(err) {
+				//     console.log('跳转失败', err);
+				//   }
+				// });
 			},
 			footBarBtn(item){
+				if(!this.inputState){
+					// 数据流未完成不能切换
+					return
+				}
 				// 切换模式
 				if(item.name==='智能导诊'){
-					this.begin()
 					this.pattern = 1
 					uni.showToast({
 					    title: '已为您切换到智能导诊',
@@ -313,6 +368,7 @@
 					]
 				}
 			},
+			// 登录成功后重新渲染foot
 			updateData(){
 				this.showComponent = false
 				this.$nextTick(()=>{
@@ -323,29 +379,32 @@
 				this.Focus = false
 			},
 			footType(item){
-				const appId = 'wx6334d37b051ec074';
-				const data = {
-				  checkedDep: {
-				    departmentld:item.id,
-				    departmentCode:item.id,
-				    departmentName: item.name,
-				    typeFlag: "cliGroup"
-				  },
-				  checkedFirDep: ""
-				};
-				const jsonString = JSON.stringify(data);
-				const encodedData = encodeURIComponent(jsonString);
-				const targetUrl = `/pages/outpatient-doctor-list/main?dep=${encodedData}`;
-				wx.navigateToMiniProgram({
-				  appId: appId,
-				  path: targetUrl,
-				  envVersion: 'release',
-				  success: function(res) {
-				  },
-				  fail: function(err) {
-				    console.log('跳转失败', err);
-				  }
-				});
+				uni.navigateTo({
+					url: `/sub_packages/subscribe/doctors?title=${item.name}&CLGRPRowId=${item.id}`
+				})
+				// const appId = 'wx6334d37b051ec074';
+				// const data = {
+				//   checkedDep: {
+				//     departmentld:item.id,
+				//     departmentCode:item.id,
+				//     departmentName: item.name,
+				//     typeFlag: "cliGroup"
+				//   },
+				//   checkedFirDep: ""
+				// };
+				// const jsonString = JSON.stringify(data);
+				// const encodedData = encodeURIComponent(jsonString);
+				// const targetUrl = `/pages/outpatient-doctor-list/main?dep=${encodedData}`;
+				// wx.navigateToMiniProgram({
+				//   appId: appId,
+				//   path: targetUrl,
+				//   envVersion: 'release',
+				//   success: function(res) {
+				//   },
+				//   fail: function(err) {
+				//     console.log('跳转失败', err);
+				//   }
+				// });
 			},
 			// 保持消息体可见
 			msgGo(i){
@@ -407,132 +466,114 @@
 				this.msg=""
 
 			},
-			begin(){
-				// 导诊需要先发送一次请求
-				wx.request({
-					url: 'https://www.chinzsoft.com/api/v1/chat-messages',
-					method: 'POST',
-					data: {
-					  query: '开始导诊',
-					  inputs: {
-					    sex: '男',
-					    age: '24',
-					  },
-					  response_mode: "blocking",
-					  conversation_id: this.conversation_id,
-					  user: "abc-123"
-					},
-					header: {
-					  'Authorization': 'Bearer app-EONXg7ao70KnPGUvvpq4ffVE',
-					  'content-type': 'application/json',
-					},
-					success: (res) => {
-																  this.conversation_id = res.data.conversation_id
-					},
-					fail: (err) => {
-																  console.log('err',err)
-					},
-				});
-			},
 			msgKf(msg){
 				// 必须建档
-				// this.$login.loginData().then(data => {
-					this.msgList.push({msgLoad:true})
-					this.inputState = false
-					const requestTask = wx.request({
-					  url: 'https://www.chinzsoft.com/api/v1/chat-messages', // 流式接口的URL
-					  method: 'POST',
-					  data: {
-					    query: msg,
-					   inputs: {
-					     sex: this.patient.sex?this.patient.sex:'男',
-					     age: this.patient.age?this.patient.age:24,
-					   },
-					    response_mode: "streaming",
-					    conversation_id: this.conversation_id,
-					    user: "abc-123"
-					  },
-					  enableChunked: true,
-					  // enableHttp2:true,
-					  header: {
-					    'Authorization': `Bearer ${this.pattern===1?this.patternList[0]:this.patternList[1]}`,
-					    'content-type': 'application/json',
-					  },
-					  success: (res) => {
-						  if(this.pattern===1){
-							this.test1 = ''
-							if(!this.test2.is_complete){
-								this.mode = this.test2.mode
+				this.msgList.push({msgLoad:true})
+				this.inputState = false
+				const requestTask = wx.request({
+				  url: 'https://www.chinzsoft.com/api/v1/chat-messages', // 流式接口的URL
+				  method: 'POST',
+				  data: {
+				    query: msg,
+				   inputs: {
+				     sex: this.patient.sex?this.patient.sex:'男',
+				     age: this.patient.age?this.patient.age:24,
+				   },
+				    response_mode: "streaming",
+				    conversation_id: this.conversation_id,
+				    user: "abc-123"
+				  },
+				  enableChunked: true,
+				  // enableHttp2:true,
+				  header: {
+				    'Authorization': `Bearer ${this.pattern===1?this.patternList[0]:this.patternList[1]}`,
+				    'content-type': 'application/json',
+				  },
+				  success: (res) => {
+					  if(this.pattern===1){
+						this.test1 = ''
+						if(!this.test2.is_complete){
+							this.mode = this.test2.mode
+							if(this.test2.option.length){
 								this.DataList.main = this.test2.option.map(item=> {
 								    return {value:item}
 								})
 								this.$refs.popup.open('bottom')   //弹框
-							}else {
-								const content = {
-									my:false,
-									type:2,
-									msgLoad:false,
-									department:this.test2.option?this.test2.option:[],
-								}
-								this.conversation_id = ''
-								this.msgList.splice(this.msgList.length-1,1,content)
-							}  
-						  }else {
-							  this.test1 = ''
-						  }
-						  
-						  this.msgGo()
-						  this.inputState = true
-					  },
-					  fail: (err) => {
-						  console.log('err',err)
-						  this.inputState = true
-					  },
-					});
-					requestTask.onChunkReceived((response) => {
-					  // 收到流式数据，根据返回值进行相对应数据解码
-					  const arrayBuffer = response.data;
-					  const uint8Array = new Uint8Array(arrayBuffer);
-					  let text = uni.arrayBufferToBase64(uint8Array)
-					  text = new Buffer(text, 'base64')
-					  let responseText = text.toString('utf-8')
-					  let data = responseText.split('data: ')
-					  let i 
-					  for (let j = 0; j < data.length; j++) {
-						if(!j) continue;
-						if(!data[j].includes('message') || data[j].includes('message_end')){
-							break
-						}
-					    i = JSON.parse(data[j])
-						this.conversation_id = i.conversation_id
-						// i.answer = i.answer&&i.answer.replace(/[ \r\n\u21B5]/g,'')
-						if(i.answer){
-							this.test1 += i.answer
-							if(this.pattern===1){
-								this.test2 = parse(this.test1)
-								if(!this.test2.is_complete){
-									if(this.test2.response){
+							}
+						}else {
+							this.conversation_id = ''
+						}  
+					  }else {
+						  this.test1 = ''
+					  }
+					  
+					  this.msgGo()
+					  this.inputState = true
+				  },
+				  fail: (err) => {
+					  console.log('err',err)
+					  this.inputState = true
+				  },
+				});
+				requestTask.onChunkReceived((response) => {
+					try {
+						// 收到流式数据，根据返回值进行相对应数据解码
+						const arrayBuffer = response.data;
+						const uint8Array = new Uint8Array(arrayBuffer);
+						let text = uni.arrayBufferToBase64(uint8Array)
+						text = new Buffer(text, 'base64')
+						let responseText = text.toString('utf-8')
+						let data = responseText.split('data: ')
+						let i 
+						for (let j = 0; j < data.length; j++) {
+							if(!j) continue;
+							if(!data[j].includes('message') || data[j].includes('message_end')){
+								break
+							}
+							i = JSON.parse(data[j])
+							this.conversation_id = i.conversation_id
+							// i.answer = i.answer&&i.answer.replace(/[ \r\n\u21B5]/g,'')
+							if(i.answer){
+								this.test1 += i.answer
+								if(this.pattern===1){
+									this.test2 = parse(this.test1)
+									if(!this.test2.is_complete){
+										if(this.test2.response){
+											const content = {
+												my:false,
+												msgLoad:false,
+												msg:this.test2.response?this.test2.response.replace(/\[.*?\]/, ''):'',
+											}
+											this.msgList.splice(this.msgList.length-1,1,content)		  
+										}
+									}else {
+										const originalTipsState = this.msgList[this.msgList.length - 1]?.tipsState;
 										const content = {
 											my:false,
+											type:2,
 											msgLoad:false,
-											msg:this.test2.response?this.test2.response.replace(/\[.*?\]/, ''):'',
+											department:this.test2.option?this.test2.option:[],
+											tips:this.test2.reason?this.test2.reason:'',
+											tipsState: originalTipsState
 										}
-										this.msgList.splice(this.msgList.length-1,1,content)		  
+										this.msgList.splice(this.msgList.length-1,1,content)
 									}
-								}	
-							}else {
-								const content = {
-									my:false,
-									msgLoad:false,
-									msg:this.test1?this.test1.replace(/\[.*?\]/, ''):'',
+								}else {
+									const content = {
+										my:false,
+										msgLoad:false,
+										msg:this.test1?this.test1.replace(/\[.*?\]/, ''):'',
+									}
+									this.msgList.splice(this.msgList.length-1,1,content)
 								}
-								this.msgList.splice(this.msgList.length-1,1,content)
 							}
-									 
 						}
-					  }
-					});
-				// })
+					} catch (error) {
+						console.log('error',error)
+						//TODO handle the exception
+					}
+				  
+				});
 			},
 			//弹窗事件
 			choice(index){
@@ -650,10 +691,10 @@
 		},
 		
 		 mounted() {
-			
 			// 监听键盘拉起
 			// 因为无法控制键盘拉起的速度,所以这里尽量以慢速处理
 			uni.onKeyboardHeightChange(res => {
+				console.log('监听事件........');
 				const query = uni.createSelectorQuery().in(this);
 				query.select('#okk').boundingClientRect(data => {
 					// 若消息体没有超过2倍的键盘则向下移动差值,防止遮住消息体
@@ -687,7 +728,6 @@
 </script>
 
 <style lang="less" scoped>
-	
     .virtual{
 		height: 100%;
 		position: relative;
@@ -751,7 +791,7 @@
 							display: flex;
 							justify-content: flex-end;
 							align-items: center;
-							width: 460rpx;
+							width: 630rpx;
 							margin: 20rpx 25rpx 20rpx 0;
 							
 							.triangle {
@@ -759,12 +799,11 @@
 							 	height: 0;
 							 	border-style: solid;
 							 	border-width: 15rpx 0 15rpx 18rpx;
-							 	border-color: transparent transparent transparent #076aff;
+							 	border-color: transparent transparent transparent rgba(7,106,255,0.80);
 							}
 							
 							.center {
-								
-								background: #076aff;
+								background: rgba(7,106,255,0.80);
 							    padding: 20rpx 24rpx;
 							    border-radius: 12rpx;
 							    color: #ffffff;
@@ -788,7 +827,7 @@
 						display: flex;
 						justify-content: flex-start;
 						align-items: center;
-						width: 630rpx;
+						width: 680rpx;
 						margin: 20rpx 0 20rpx 25rpx;
 						
 						.triangle {
@@ -824,6 +863,12 @@
 										}
 									}
 								}
+								.ai-tips {
+									margin-top: 20rpx;
+									text-align: center;
+									font-size: 26rpx;
+									color: #919191;
+								}
 								
 							}
 							
@@ -833,10 +878,14 @@
 							display: flex;
 							justify-content: flex-start;
 							align-items: center;
-							width: 560rpx;
+							min-width: 560rpx;
+							max-width: 660rpx;
 							margin: 20rpx 0 20rpx 25rpx;
 							position: relative;
-							image {
+							padding:20rpx 24rpx;
+							background: rgba(255,255,255,0.80);
+							border-radius: 12rpx;
+							>image {
 								position: absolute;
 								width: 560rpx;
 								height: 380rpx;
@@ -844,18 +893,18 @@
 							.top2-content {
 								position: relative;
 								width: 560rpx;
-								height: 380rpx;
+								// height: 380rpx;
 								
 								
 								.department {
-									back
 									width: 100%;
-									height: 50%;
+									height: 190rpx;
 									color: #000000;
 									.title {
 										display: flex;
 										align-items: center;
 										height: 30%;
+										font-weight: 600;
 										font-size: 34rpx;
 										margin-left: 20rpx;
 									}
@@ -873,7 +922,7 @@
 											transform: translate(16rpx,0);
 											width: 52rpx;
 											height: 52rpx;
-											image {
+											>image {
 												display: block;
 												width: 52rpx;
 											    height: 52rpx;
@@ -902,7 +951,7 @@
 											.top2-img {
 												width: 22rpx;
 												height: 22rpx;
-												image {
+												>image {
 													display: block;
 													width: 22rpx;
 												    height: 22rpx;
@@ -915,7 +964,32 @@
 										}
 									}
 								}
-								
+								.more {
+									// width: 100%;
+									color: #1A66C2;
+									margin: 0 20rpx;
+									display: flex;
+									align-items: center;
+									justify-content: space-between;
+									>text {
+										border-bottom: 2rpx solid #1A66C2;
+									}
+									>image {
+										width: 45rpx;
+										height: 45rpx;
+									}
+								}
+								.dept-tips {
+									margin: 20rpx 20rpx 10rpx 20rpx;
+									font-size: 30rpx;
+									
+								}
+							}
+							.ai-tips {
+								margin-top: 20rpx;
+								text-align: center;
+								font-size: 26rpx;
+								color: #919191;
 							}
 						}
 					}
@@ -1366,7 +1440,64 @@
 		
 			/*---------------------------------- 语音样式结束------------------------------ */
 			
-		
+		.loading {
+			display: flex;
+			align-items: center;
+			color: #888;
+			.dot {
+				width: 45rpx;
+				.stage {
+				    display: flex;
+				    justify-content: center;
+				    align-items: center;
+					padding: 12rpx 0 0 0;
+				    overflow: hidden;
+					transform: translate(0,8rpx);
+					.dot-typing {
+					    position: relative;
+					    left: -9995px;
+					    width: 3px;
+					    height: 3px;
+					    border-radius: 3px;
+					    background-color: #888;
+					    color: #888;
+					    box-shadow: 9988px 0 0 0 #888, 9994px 0 0 0 #888,
+					      10000px 0 0 0 #888;
+					    animation: dotTyping 1.5s infinite linear;
+					}
+					@keyframes dotTyping {
+					        0% {
+					          box-shadow: 9988px 0 0 0 #888, 9994px 0 0 0 #888,
+					            10000px 0 0 0 #888;
+					        }
+					        16.667% {
+					          box-shadow: 9988px -3px 0 0 #888, 9994px 0 0 0 #888,
+					            10000px 0 0 0 #888;
+					        }
+					        33.333% {
+					          box-shadow: 9988px 0 0 0 #888, 9994px 0 0 0 #888,
+					            10000px 0 0 0 #888;
+					        }
+					        50% {
+					          box-shadow: 9988px 0 0 0 #888, 9994px -3px 0 0 #888,
+					            10000px 0 0 0 #888;
+					        }
+					        66.667% {
+					          box-shadow: 9988px 0 0 0 #888, 9994px 0 0 0 #888,
+					            10000px 0 0 0 #888;
+					        }
+					        83.333% {
+					          box-shadow: 9988px 0 0 0 #888, 9994px 0 0 0 #888,
+					            10000px -3px 0 0 #888;
+					        }
+					        100% {
+					          box-shadow: 9988px 0 0 0 #888, 9994px 0 0 0 #888,
+					            10000px 0 0 0 #888;
+					        }
+					      }
+				}
+			}
+		}
 	}
 </style>
 
