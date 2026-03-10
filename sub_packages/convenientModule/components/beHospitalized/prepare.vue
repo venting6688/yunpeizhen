@@ -4,7 +4,7 @@
 			<view class="content" v-if="!register">
 				<view class="title">
 					<view class="left">
-						住院申请单
+						住院申请单{{register}}
 					</view>
 					<view class="right">
 						<image src="../../../static/image/add.png" mode=""></image>
@@ -225,7 +225,7 @@
 		data() {
 			return {
 				firstContent:{},
-				register:false,
+				register:true,
 				callObj:{
 					calling:'',
 					departmentName:'',

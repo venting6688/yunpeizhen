@@ -69,18 +69,11 @@
 						type:1,
 					},
 					{
-						pagePath: "pages/convenient/index",
+						pagePath: "pages/user/index",
 						iconPath:'https://aiwz.sdtyfy.com:8099/img/footNavigation1+.png',
 						selectedIconPath:'https://aiwz.sdtyfy.com:8099/img/footNavigation1.png',
-						name:'便捷导引',
+						name:'我的',
 						type:2,
-					},
-					{
-						pagePath: "pages/more/index",
-						iconPath:'https://aiwz.sdtyfy.com:8099/img/footNavigation2+.png',
-						selectedIconPath:'https://aiwz.sdtyfy.com:8099/img/footNavigation2.png',
-						name:'更多服务',
-						type:3,
 					},
 				],
 				registerData:{
@@ -176,7 +169,7 @@
 </script>
 
 <style lang="less" scoped>
-	    .footPadding{
+	.footPadding{
 		padding:0 0 165rpx 0 !important;
 	    }
 	    .blue {
@@ -185,10 +178,12 @@
 		.bar-w{
 			width: 100% !important;
 		}
-        .foot {
+		.foot {
 			width: 750rpx;
 			height: 144rpx;
 			padding:5rpx 0 160rpx 0;
+			position: absolute;
+			bottom: 0;
 			background: #ffffff;
 			z-index: 100;
 			box-shadow: 0rpx -4rpx 8rpx 0rpx rgba(184,192,204,0.20);
@@ -275,7 +270,7 @@
 					display: flex;
 					
 					.piece {
-						width: 33.333%;
+						width: 50%;
 						height: 144rpx;
 						font-size: 24rpx;
 						color: #000000;

@@ -14,7 +14,14 @@
 	  		"disableScroll": true
 	    }
 	},
-	
+	{
+		"path": "pages/user/index",
+		"style": {
+			"navigationStyle": "custom",
+			"navigationBarTitleText": "我的",
+			"disableScroll": true
+		}
+	},
 	{
 	  "path": "pages/convenient/index",
 	  "style": {
@@ -31,15 +38,15 @@
 		    "inventory": "view"
 		}
 	  }
-	},
-	{
-	  "path": "pages/payAFee",
-	  "style": {
-	    "navigationBarTitleText": "处方缴费",
-	    "disableScroll": true,
-	    "enablePullDownRefresh": false
-	  }
 	}
+	// {
+	//   "path": "pages/payAFee",
+	//   "style": {
+	//     "navigationBarTitleText": "处方缴费",
+	//     "disableScroll": true,
+	//     "enablePullDownRefresh": false
+	//   }
+	// }
   ],
   "subPackages": [{
   	"root": "sub_packages",
@@ -312,10 +319,7 @@
   				"pagePath": "pages/virtualNurse/index"
   			},
   			{
-  				"pagePath": "pages/convenient/index"
-  			},
-  			{
-  				"pagePath": "pages/more/index"
+  				"pagePath": "pages/user/index"
   			}
   		]
   		

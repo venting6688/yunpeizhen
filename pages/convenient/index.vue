@@ -8,6 +8,7 @@
 			<answer @handle="show" v-if="headerEmit.state=='回诊'" :headerEmit="headerEmit" />
 			<prescription @handle="show" v-if="headerEmit.state=='处方'" :headerEmit="headerEmit" />
 		</view>
+		
 		<view v-else class="scroll-Y" :animation="animationData">
 			
 			<prepare v-if="headerEmit.state=='住院信息'" :headerEmit="headerEmit" />

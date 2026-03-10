@@ -100,11 +100,11 @@
 			  </view>
 			</uni-popup>
 		    <view class="foot">
-				<view class="foot-bar">
+				<!-- <view class="foot-bar">
 					<view :class="{blue:item.state===pattern}" class="test" v-for="item in footBar" :key="item" @click="footBarBtn(item)">
 						<text>{{item.name}}</text>
 					</view>
-				</view>
+				</view> -->
 				<view v-if="voiceState" class="foot-center">
 					<view class="image">
 					<image @click="voiceState=false" src="@/static/image/keyword.png" mode=""></image>	
@@ -195,10 +195,10 @@
 			return {
 				md: new MarkdownIt(),
 				pattern:2,
-				patternList:[
-					'app-3y1tj6dptbvU0KIcFJorXU4Z',
-					'app-jvcTkWue6jt4pb06TWZGAsHI',
-				],
+				// patternList:[
+				// 	'app-3y1tj6dptbvU0KIcFJorXU4Z',
+				// 	'app-jvcTkWue6jt4pb06TWZGAsHI',
+				// ],
 				showComponent: true,
 				text:'',
 				number:1,
@@ -217,16 +217,16 @@
 					}
 				],      //消息集合
 				DataList:{},    //底部弹窗
-				footBar:[
-					{
-					name:'智能导诊',
-					state:1,
-				    },
-					{
-					name:'智能问答',
-					state:2,
-					},
-				],
+				// footBar:[
+				// 	{
+				// 	name:'智能导诊',
+				// 	state:1,
+				//     },
+				// 	{
+				// 	name:'智能问答',
+				// 	state:2,
+				// 	},
+				// ],
 				voiceState:false,        //底部切换状态
 				reply:[],
 				Focus:false,  //输入框聚焦
@@ -249,7 +249,7 @@
 			}
 		},
 		onShow() {
-			login.loginData()
+			// login.loginData()
 			const options = this.$mp.query;
 			if (options && options.patient) {
 				this.patient = JSON.parse(decodeURIComponent(options.patient))
@@ -297,10 +297,6 @@
 			    }
 			} 
 		},
-		computed: {
-		    parsedMarkdown() {
-		    }
-		},
 		methods: {
 			tipsBtn(index){
 				// 使用 this.$set 修改数组中某一项的属性
@@ -333,40 +329,40 @@
 					return
 				}
 				// 切换模式
-				if(item.name==='智能导诊'){
-					this.pattern = 1
-					uni.showToast({
-					    title: '已为您切换到智能导诊',
-					    icon: 'none',   
-					    duration: 2000 
-					}) 
-					this.conversation_id = ''
-					this.msgList = [
-						{
-						    my:false,
-							type:1,
-							msg:'您可以详细描述症状，我将为您优先推荐科室去挂号：',
-							questionList:['感冒','恶心','上吐下泻'],
-						}
-					]
+				// if(item.name==='智能导诊'){
+				// 	this.pattern = 1
+				// 	uni.showToast({
+				// 	    title: '已为您切换到智能导诊',
+				// 	    icon: 'none',   
+				// 	    duration: 2000 
+				// 	}) 
+				// 	this.conversation_id = ''
+				// 	this.msgList = [
+				// 		{
+				// 		    my:false,
+				// 			type:1,
+				// 			msg:'您可以详细描述症状，我将为您优先推荐科室去挂号：',
+				// 			questionList:['感冒','恶心','上吐下泻'],
+				// 		}
+				// 	]
 					
-				}else {
-					uni.showToast({
-					    title: '已为您切换到智能问答',
-					    icon: 'none',   
-					    duration: 2000 
-					}) 
-					this.pattern = 2
-					this.conversation_id = ''
-					this.msgList = [
-						{
-						    my:false,
-							type:1,
-							msg:'您可以向我询问以下问题：',
-							questionList:['感冒吃什么药','头孢的作用是什么'],
-						}
-					]
-				}
+				// }else {
+				// 	uni.showToast({
+				// 	    title: '已为您切换到智能问答',
+				// 	    icon: 'none',   
+				// 	    duration: 2000 
+				// 	}) 
+				// 	this.pattern = 2
+				// 	this.conversation_id = ''
+				// 	this.msgList = [
+				// 		{
+				// 		    my:false,
+				// 			type:1,
+				// 			msg:'您可以向我询问以下问题：',
+				// 			questionList:['感冒吃什么药','头孢的作用是什么'],
+				// 		}
+				// 	]
+				// }
 			},
 			// 登录成功后重新渲染foot
 			updateData(){
@@ -471,22 +467,23 @@
 				this.msgList.push({msgLoad:true})
 				this.inputState = false
 				const requestTask = wx.request({
-				  url: 'https://www.chinzsoft.com/api/v1/chat-messages', // 流式接口的URL
+				  // url: 'https://www.chinzsoft.com/api/v1/chat-messages', // 流式接口的URL
+					url: 'http://192.168.10.60/v1/workflows/run',
 				  method: 'POST',
 				  data: {
-				    query: msg,
 				   inputs: {
 				     sex: this.patient.sex?this.patient.sex:'男',
 				     age: this.patient.age?this.patient.age:24,
+						 query: msg,
 				   },
 				    response_mode: "streaming",
 				    conversation_id: this.conversation_id,
-				    user: "abc-123"
+				    user: "excel-batch-user"
 				  },
 				  enableChunked: true,
 				  // enableHttp2:true,
 				  header: {
-				    'Authorization': `Bearer ${this.pattern===1?this.patternList[0]:this.patternList[1]}`,
+				    'Authorization': `Bearer app-nsUUtcswm3bs5vdiSjveRrWr`,
 				    'content-type': 'application/json',
 				  },
 				  success: (res) => {
@@ -524,13 +521,16 @@
 						text = new Buffer(text, 'base64')
 						let responseText = text.toString('utf-8')
 						let data = responseText.split('data: ')
+						
+						console.log(JSON.stringify(data),'+++++++++++++++');
 						let i 
 						for (let j = 0; j < data.length; j++) {
 							if(!j) continue;
-							if(!data[j].includes('message') || data[j].includes('message_end')){
-								break
-							}
+							// if(!data[j].includes('message') || data[j].includes('message_end')){
+							// 	break
+							// }
 							i = JSON.parse(data[j])
+							console.log(JSON.stringify(i),'=w=w==w=w');
 							this.conversation_id = i.conversation_id
 							// i.answer = i.answer&&i.answer.replace(/[ \r\n\u21B5]/g,'')
 							if(i.answer){
@@ -1073,9 +1073,7 @@
 			}
 		
 		    .foot {
-			   
-				margin-bottom:24rpx;   //带着footbar
-				// margin-bottom:50rpx;
+					margin-bottom: 180rpx;   //带着footbar
 			    width: 750rpx;
 				
 				.foot-bar {
