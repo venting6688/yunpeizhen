@@ -210,10 +210,10 @@
 				mode:'',
 				msgList:[
 					{
-					    my:false,
+						my:false,
 						type:1,
 						msg:'您可以向我询问以下问题：',
-						questionList:['感冒吃什么药','头孢的作用是什么'],
+						questionList:['感冒吃什么药','头孢的作用','如何控制血糖','骨折的应急措施'],
 					}
 				],      //消息集合
 				DataList:{},    //底部弹窗
@@ -522,7 +522,6 @@
 						let responseText = text.toString('utf-8')
 						let data = responseText.split('data: ')
 						
-						console.log(JSON.stringify(data),'+++++++++++++++');
 						let i 
 						for (let j = 0; j < data.length; j++) {
 							if(!j) continue;
@@ -530,11 +529,10 @@
 							// 	break
 							// }
 							i = JSON.parse(data[j])
-							console.log(JSON.stringify(i),'=w=w==w=w');
 							this.conversation_id = i.conversation_id
 							// i.answer = i.answer&&i.answer.replace(/[ \r\n\u21B5]/g,'')
-							if(i.answer){
-								this.test1 += i.answer
+							if(i.data){
+								this.test1 += i.data.text ? i.data.text : ''
 								if(this.pattern===1){
 									this.test2 = parse(this.test1)
 									if(!this.test2.is_complete){
