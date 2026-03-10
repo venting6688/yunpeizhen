@@ -468,7 +468,7 @@
 				this.inputState = false
 				const requestTask = wx.request({
 				  // url: 'https://www.chinzsoft.com/api/v1/chat-messages', // 流式接口的URL
-					url: 'http://192.168.10.60/v1/workflows/run',
+					url: 'https://www.chinzsoft.com/api/v1/workflows/run',
 				  method: 'POST',
 				  data: {
 				   inputs: {
